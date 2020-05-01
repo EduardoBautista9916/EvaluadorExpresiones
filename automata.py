@@ -1,19 +1,14 @@
-global cont
-global expresion
-global num
-global var 
-global pilaNum
-global pilaOpe
-global pilaRes
-global pilaVar
+from math import sqrt, pow
 cont = 0
 expresion = ""
 num=""
 var = ""
+res = []
 pilaNum = []
 pilaOpe = []
 pilaRes = []
 pilaVar = []
+errores = ["No puede terminar en un operador",""]
 
 def inicio(cadena,cont,num,var):
     expresion=cadena
@@ -28,7 +23,7 @@ def inicio(cadena,cont,num,var):
     elif(expresion[cont]=="("):
         parentesis(expresion,cont,num,var)
     else:
-        error(expresion,cont,num,var)   
+        error(expresion,cont)   
 
 def numero(expresion,cont,num,var):
     print(expresion[cont],"es un numero")
@@ -38,31 +33,36 @@ def numero(expresion,cont,num,var):
         if(expresion[cont].isalpha()):
             pilaNum.append(num)
             pilaRes.append(num)
+            res.append(num)
             num=""
             variable(expresion,cont,num,var)
-        elif(expresion[cont].isnumeric()):
+        elif(expresion[cont].isnumeric() or expresion[cont]=="."):
             numero(expresion,cont,num,var)
         elif(isoperator(expresion[cont])):
             pilaNum.append(num)
             pilaRes.append(num)
+            res.append(num)
             num=""
             operador(expresion,cont,num,var)
         elif(expresion[cont]=="("):
             pilaNum.append(num)
             pilaRes.append(num)
+            res.append(num)
             num=""
             jerarquia("*")
             parentesis(expresion,cont,num,var)
         elif(expresion[cont]==")"):
             pilaNum.append(num)
             pilaRes.append(num)
+            res.append(num)
             num=""
             parentesis(expresion,cont,num,var)
         else:
-            error(expresion,cont,num,var)
+            error(expresion,cont)
     else:
         pilaNum.append(num)
         pilaRes.append(num)
+        res.append(num)
         num=""
         vaciarPilaOpe()
         return
@@ -72,6 +72,7 @@ def variable(expresion,cont,num,var):
     var += expresion[cont]
     pilaVar.append(var)
     pilaRes.append(var)
+    res.append(var)
     var=""
     cont +=1
     if(cont<len(expresion)):
@@ -88,7 +89,7 @@ def variable(expresion,cont,num,var):
         elif(expresion[cont]==")"):
             parentesis(expresion,cont,num,var)
         else:
-            error(expresion,cont,num,var)
+            error(expresion,cont)
     else:
         vaciarPilaOpe()
         return
@@ -102,12 +103,14 @@ def operador(expresion,cont,num,var):
             variable(expresion,cont,num,var)
         elif(expresion[cont].isnumeric()):
             numero(expresion,cont,num,var)
+        elif(expresion[cont]=="#"):
+            operador(expresion,cont,num,var)
         elif(expresion[cont]=="("):
             parentesis(expresion,cont,num,var)
         else:
-            error(expresion,cont,num,var)
+            error(expresion,cont)
     else:
-        error(expresion,cont,num,var)
+        error(expresion,cont-1)
 
 def signo(expresion,cont,num,var):
     print(expresion[cont],"es un signo")
@@ -135,9 +138,9 @@ def signo(expresion,cont,num,var):
             jerarquia("*")
             parentesis(expresion,cont,num,var)
         else:
-            error(expresion,cont,num,var)
+            error(expresion,cont)
     else:
-        error(expresion,cont,num,var)
+        error(expresion,cont-1)
 
 def parentesis(expresion,cont,num,var):
     if(expresion[cont]=="("):
@@ -157,9 +160,9 @@ def parentesis(expresion,cont,num,var):
             elif(expresion[cont]==")"):
                 parentesis(expresion,cont,num,var)
             else:
-                error(expresion,cont,num,var)
+                error(expresion,cont)
         else:
-            error(expresion,cont,num,var)
+            error(expresion,cont)
     else:
         print(expresion[cont],"es un parentesis que cierra")
         vaciarParentesis()
@@ -180,12 +183,12 @@ def parentesis(expresion,cont,num,var):
             elif(expresion[cont]==")"):
                 parentesis(expresion,cont,num,var)
             else:
-                error(expresion,cont,num,var)
+                error(expresion,cont)
         else:
             vaciarPilaOpe()
             return
 
-def error(expresion,cont,num,var):
+def error(expresion,cont):
     print(expresion[cont],"Error")
     return
 
@@ -201,30 +204,63 @@ def jerarquia(car):
             print("Alto",pilaOpe[len(pilaOpe)-1])
             while((len(pilaOpe)!=0) and (pilaOpe[len(pilaOpe)-1]=="#" or pilaOpe[len(pilaOpe)-1]=="^")):
                 pilaRes.append(pilaOpe.pop())
+                evaluar(pilaRes[len(pilaRes)-1])
                 print("entro ^ #")
         elif(car=="*" or car=="/"):
             print("Medio",pilaOpe[len(pilaOpe)-1])
             while((len(pilaOpe)!=0) and (pilaOpe[len(pilaOpe)-1]=="*" or pilaOpe[len(pilaOpe)-1]=="^" or pilaOpe[len(pilaOpe)-1]=="#" or pilaOpe[len(pilaOpe)-1]=="^")):
                 pilaRes.append(pilaOpe.pop())
+                evaluar(pilaRes[len(pilaRes)-1])
                 print("entro * /")
         elif(car=="+" or car=="-"):
             print("Bajo",pilaOpe[len(pilaOpe)-1])
             while((len(pilaOpe)!=0) and (pilaOpe[len(pilaOpe)-1]=="+" or pilaOpe[len(pilaOpe)-1]=="-" or pilaOpe[len(pilaOpe)-1]=="*" or pilaOpe[len(pilaOpe)-1]=="^" or pilaOpe[len(pilaOpe)-1]=="#" or pilaOpe[len(pilaOpe)-1]=="^")):
                 pilaRes.append(pilaOpe.pop())
+                evaluar(pilaRes[len(pilaRes)-1])
                 print("entro + -")
     pilaOpe.append(car)
 
+def evaluar(ope):
+    if ope == "#":
+        a = float(res.pop())
+        res.append(sqrt(a))
+    elif ope == "^":
+        a = float(res.pop())
+        b = float(res.pop())
+        res.append(pow(b,a))
+    elif ope == "*":
+        a = float(res.pop())
+        b = float(res.pop())
+        res.append(b*a)
+    elif ope == "/":
+        a = float(res.pop())
+        b = float(res.pop())
+        res.append(b/a)
+    elif ope == "+":
+        a = float(res.pop())
+        b = float(res.pop())
+        res.append(b+a)
+    elif ope == "-":
+        a = float(res.pop())
+        b = float(res.pop())
+        res.append(b-a)
+
 def vaciarPilaOpe():
     while(len(pilaOpe)!=0):
+        if(pilaOpe[len(pilaOpe)-1]=="("):
+            print("error parentesis abre pero no cierra")
+            break
+        evaluar(pilaOpe[len(pilaOpe)-1])
         pilaRes.append(pilaOpe.pop())
 
 def vaciarParentesis():
     while((len(pilaOpe)!=0) and (pilaOpe[len(pilaOpe)-1]!="(")):
+        evaluar(pilaOpe[len(pilaOpe)-1])
         pilaRes.append(pilaOpe.pop())
     if(len(pilaOpe)!=0):
         pilaOpe.pop()
-    
-#cadena = "2-3*4(9a-7b-8a)"
-cadena = "4-3*5-(8*5+6/2)+2)"
+
+cadena = "5+(#(5^2+3-4)+"
 inicio(cadena,cont,num,var)
-print(pilaNum,pilaOpe,pilaVar,pilaRes)
+print(pilaNum,pilaVar,pilaOpe,pilaRes)
+print(res)
