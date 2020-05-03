@@ -21,8 +21,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPix
-        map("Pictures/iconWindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("Pictures/iconWindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(80, 80, 80);\n"
@@ -274,14 +273,14 @@ class Ui_MainWindow(object):
         self.lblProcess.setFont(font)
         self.lblProcess.setObjectName("lblProcess")
         self.txtProcess = QtWidgets.QPlainTextEdit(self.pnlLeft)
-        self.txtProcess.setEnabled(False)
+        self.txtProcess.setReadOnly(True)
         self.txtProcess.setGeometry(QtCore.QRect(100, 10, 380, 105))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
         self.txtProcess.setFont(font)
         self.txtProcess.setStyleSheet("background-color:rgb(150,150,150);\n"
-                                        "color:rgb(0,255,0);")
+                                        "color:rgb(10,135,20);")
         self.txtProcess.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.txtProcess.setPlainText("")
         self.txtProcess.setObjectName("txtProcess")
@@ -346,7 +345,7 @@ class Ui_MainWindow(object):
         self.lblError.setFont(font)
         self.lblError.setObjectName("lblError")
         self.txtError = QtWidgets.QPlainTextEdit(self.pnlLeft)
-        self.txtError.setEnabled(False)
+        self.txtError.setReadOnly(False)
         self.txtError.setGeometry(QtCore.QRect(100, 125, 380, 105))
         font = QtGui.QFont()
         font.setFamily("Consolas")
@@ -449,6 +448,12 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+    def imprimirProscess(self, cadena):
+        cad = self.txtProcess.toPlainText()+cadena+"\n"
+        self.txtProcess.setPlainText(cad)
+    def imprimirError(self, cadena):
+        cad = self.txtError.toPlainText()+cadena+"\n"
+        self.txtError.setPlainText(cad)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
