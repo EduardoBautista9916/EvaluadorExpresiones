@@ -11,4 +11,5 @@ para poder saber que accion se realizara con cada una de ellas.
 
 ## Autor
 
+* **Alvares Cortes Kevin Alejendro**(https://github.com/kevinalex113)
 * **Bautista Gaona Luis Eduardo**(https://github.com/EduardoBautista9916)
